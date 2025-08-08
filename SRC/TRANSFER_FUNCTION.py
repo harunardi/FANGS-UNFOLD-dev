@@ -22,18 +22,6 @@ from SOLVERFACTORY import SolverFactory
 original_sys_path = sys.path.copy()
 sys.path.append('../')
 
-#from INPUTS.TASK1_TEST02_1DMG_CSTest03 import *
-#from INPUTS.TASK1_TEST03_1DMG_CSTest05 import *
-
-#from INPUTS.TASK1_TEST07_2DMG_C3_VandV import *
-#from INPUTS.TASK1_TEST09_2DMG_PWRMOX_VandV import *
-
-#from INPUTS.TASK1_TEST14_3DMG_PWRMOX1 import *
-
-#from INPUTS.TASK1_TEST24_3DTriMG_HTTR import *
-
-#from INPUTS.TASK1_TEST18_2DTriMG_HTTR2G_VandV import *
-
 #from INPUTS.OBJECTIVES2_TEST01_1DMG_CSTest03 import *
 #from INPUTS.OBJECTIVES2_TEST02_2DMG_C3_VandV import *
 #from INPUTS.OBJECTIVES2_TEST03_2DMG_BIBLIS_VandV import *
@@ -54,8 +42,6 @@ sys.path.append('../')
 #from INPUTS.OBJECTIVES3_TEST07_3DTriMG_HTTR_AVS import *
 #from INPUTS.OBJECTIVES3_TEST08_3DTriMG_HTTR_FAV import *
 from INPUTS.OBJECTIVES3_TEST09_3DMG_Langenbuch_AVS import *
-
-#from INPUTS.TASK1_TEST22_3DTriMG_3rings import *
 
 # Restore the original sys.path
 sys.path = original_sys_path

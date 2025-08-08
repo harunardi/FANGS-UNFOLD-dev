@@ -28,23 +28,9 @@ from SRC_UNFOLDING_2D_RECT import *
 original_sys_path = sys.path.copy()
 sys.path.append('../')
 
-#from INPUTS.TASK3_TEST02a_2DMG_PWRMOX1_1SRC_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02b_2DMG_PWRMOX1_2SRC_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02c_2DMG_PWRMOX1_3SRC_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02d_2DMG_PWRMOX1_4SRC_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02e_2DMG_PWRMOX1_5SRC_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02f_2DMG_PWRMOX1_6SRC_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02g_2DMG_PWRMOX1_1SRC_21DET_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02h_2DMG_PWRMOX1_1SRC_10DET_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02i_2DMG_PWRMOX1_1SRC_5DET_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02j_2DMG_PWRMOX1_1SRC_1DET_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02k_2DMG_PWRMOX3_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02l_2DMG_PWRMOX5_AVS_NONCENTER import *
-#from INPUTS.TASK3_TEST02m_2DMG_PWRMOX5_FAV_AVS_NONCENTER import *
-
-#from INPUTS.OBJECTIVES45_TEST01_2DMG_BIBLIS_AVS import *
+from INPUTS.OBJECTIVES45_TEST01_2DMG_BIBLIS_AVS import *
 #from INPUTS.OBJECTIVES45_TEST02_2DMG_BIBLIS3_FAV import *
-from INPUTS.OBJECTIVES45_TEST09_2DMG_BIBLIS_AVS3S import *
+#from INPUTS.OBJECTIVES45_TEST09_2DMG_BIBLIS_AVS3S import *
 
 # Restore the original sys.path
 sys.path = original_sys_path
@@ -115,7 +101,6 @@ def main():
         dPHI_temp_BRUTE, dS_unfold_BRUTE_temp = main_unfold_2D_rect_brute(dPHI_temp_meas, dPHI_temp, S, G_matrix, group, N, I_max, J_max, conv, map_detector, output_dir, case_name, x, y)
 
 #### GREEDY METHOD
-#    dPHI_temp_GREEDY, dS_unfold_GREEDY_temp = main_unfold_2D_rect_greedy(dPHI_temp_meas, dPHI_temp, S, G_matrix, group, N, I_max, J_max, conv, output_dir, case_name, x, y)
     dPHI_temp_GREEDY, dS_unfold_GREEDY_temp = main_unfold_2D_rect_greedy_new(dPHI_temp_meas, dPHI_temp, S, G_matrix, group, N, I_max, J_max, conv, output_dir, case_name, x, y)
 
     end_time = time.time()

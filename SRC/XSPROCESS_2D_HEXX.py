@@ -46,6 +46,17 @@ def save_sparse_matrix(A, filename):
 
 # Function to convert 2D hexagonal indexes
 def convert_2D_hexx(I_max, J_max, D):
+    """
+    Convert 2D hexagonal indices based on nonzero elements in D.
+    
+    Parameters:
+        I_max (int): Number of columns.
+        J_max (int): Number of rows.
+        D (array): 3D array where D[0][j][i] is checked for nonzero.
+    
+    Returns:
+        list: Conversion array with incremented indices for nonzero D[0][j][i].
+    """
     conv_hexx = [0] * (I_max*J_max)
     tmp_conv = 0
     for j in range(J_max):  
@@ -101,25 +112,34 @@ def convert_2D_tri(I_max, J_max, conv_hexx, level):
 
 # Function to save data in HDF5 format
 def save_output_hdf5(hdf5_filename, output):
+    """
+    Save output dictionary with complex numbers to HDF5 file.
+    
+    Parameters:
+        hdf5_filename (str): Output HDF5 file path.
+        output (dict): Dictionary with keys and list of dicts with 'real' and 'imaginary'.
+    """
     with h5py.File(hdf5_filename, 'w') as hdf5_file:
         for groupname, data in output.items():
             hdf5_group = hdf5_file.create_group(groupname)
             hdf5_group.create_dataset("real", data=[item["real"] for item in data])
             hdf5_group.create_dataset("imaginary", data=[item["imaginary"] for item in data])
 
-# Function to load data in HDF5 format
-def load_output_hdf5(filename):
-    output_list = []
-    with h5py.File(filename, 'r') as f:
-        for key in f.keys():
-            real_data = f[f'{key}/real'][:]
-            imag_data = f[f'{key}/imaginary'][:]
-            complex_data = [complex(real, imag) for real, imag in zip(real_data, imag_data)]
-            output_list.extend(complex_data)
-    return output_list
-
 ##############################################################################
 def expand_XS_hexx_2D(group, J_max, I_max, XS, level):
+    """
+    Expand cross section data for hexagonal 2D geometry to triangles.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        J_max (int): Number of rows.
+        I_max (int): Number of columns.
+        XS (array): Cross section data.
+        level (int): Subdivision level.
+    
+    Returns:
+        list: Expanded cross section data for triangles.
+    """
     n = 6 * (4 ** (level - 1))
 
     XS_temp = np.reshape(XS, (group, I_max, J_max))
@@ -135,6 +155,19 @@ def expand_XS_hexx_2D(group, J_max, I_max, XS, level):
     return XS_hexx
 
 def expand_SIGS_hexx_2D(group, I_max, J_max, SIGS, level):
+    """
+    Expand scattering cross section data for hexagonal 2D geometry to triangles.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        I_max (int): Number of columns.
+        J_max (int): Number of rows.
+        SIGS (array): Scattering cross section data.
+        level (int): Subdivision level.
+    
+    Returns:
+        list: Expanded scattering cross section data for triangles.
+    """
     n = 6 * (4 ** (level - 1))
 
     SIGS_hexx = [[[0] * I_max * J_max * n for _ in range(group)] for _ in range(group)]

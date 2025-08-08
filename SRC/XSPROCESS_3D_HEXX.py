@@ -11,13 +11,6 @@ from scipy.interpolate import griddata
 os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
 sys.dont_write_bytecode = True
 
-#from SRC_ALL.CONVERT_TRI_NEIGHBOR_3D import *
-
-#from SRC_ALL.CONVERT_TRI_NEIGHBOR_3D_level1 import *
-#from SRC_ALL.CONVERT_TRI_NEIGHBOR_3D_level2 import *
-#from SRC_ALL.CONVERT_TRI_NEIGHBOR_3D_level3 import *
-#from SRC_ALL.CONVERT_TRI_NEIGHBOR_3D_level4 import *
-
 ##############################################################################
 # Function to save sparse matrix to file
 def save_sparse_matrix(A, filename):
@@ -47,6 +40,18 @@ def save_sparse_matrix(A, filename):
 
 # Function to convert 3D hexagonal indexes
 def convert_3D_hexx(K_max, J_max, I_max, D):
+    """
+    Convert 3D hexagonal indices based on nonzero elements in D.
+    
+    Parameters:
+        K_max (int): Number of axial layers.
+        J_max (int): Number of rows.
+        I_max (int): Number of columns.
+        D (array): 4D array where D[0][k][j][i] is checked for nonzero.
+    
+    Returns:
+        list: Conversion array with incremented indices for nonzero D[0][k][j][i].
+    """
     conv_hexx = [0] * (K_max * J_max * I_max)
     tmp_conv = 0
     for k in range(K_max):
@@ -105,23 +110,19 @@ def convert_3D_tri(K_max, J_max, I_max, conv_hexx, level):
 
 # Function to save data in HDF5 format
 def save_output_hdf5(filename, output_dict):
+    """
+    Save output dictionary with complex numbers to HDF5 file.
+    
+    Parameters:
+        filename (str): Output HDF5 file path.
+        output_dict (dict): Dictionary with keys and list of dicts with 'real' and 'imaginary'.
+    """
     with h5py.File(filename, 'w') as f:
         for key, value in output_dict.items():
             real_data = np.array([complex_number['real'] for complex_number in value])
             imag_data = np.array([complex_number['imaginary'] for complex_number in value])
             f.create_dataset(f'{key}/real', data=real_data)
             f.create_dataset(f'{key}/imaginary', data=imag_data)
-
-# Function to load data in HDF5 format
-def load_output_hdf5(filename):
-    output_dict = {}
-    with h5py.File(filename, 'r') as f:
-        for key in f.keys():
-            real_data = f[f'{key}/real'][:]
-            imag_data = f[f'{key}/imaginary'][:]
-            complex_data = [complex(real, imag) for real, imag in zip(real_data, imag_data)]
-            output_dict[key] = [{"real": c.real, "imaginary": c.imag} for c in complex_data]
-    return output_dict
 
 ##############################################################################
 def expand_XS_hexx_3D(group, K_max, J_max, I_max, XS, level):

@@ -23,6 +23,17 @@ x, y = 0, 0
 #######################################################################################################
 # Function to convert 2D rectangular indexes
 def convert_index_2D_rect(D, I_max, J_max):
+    """
+    Convert 2D rectangular indices based on nonzero elements in D.
+    
+    Parameters:
+        D (array): 3D array where D[0][j][i] is checked for nonzero.
+        I_max (int): Number of columns.
+        J_max (int): Number of rows.
+    
+    Returns:
+        list: Conversion array with incremented indices for nonzero D[0][j][i].
+    """
     conv = [0] * (I_max*J_max)
     tmp_conv = 0
     for j in range(J_max):  
@@ -35,6 +46,13 @@ def convert_index_2D_rect(D, I_max, J_max):
 
 # Function to save sparse matrix to file
 def save_sparse_matrix(A, filename):
+    """
+    Save a sparse matrix to a text file in COO format.
+    
+    Parameters:
+        A (scipy.sparse matrix): Sparse matrix to save.
+        filename (str): Output file path.
+    """
     # Convert lil_matrix to coo_matrix to use find() function
     A_coo = A.tocoo()
     
@@ -50,22 +68,18 @@ def save_sparse_matrix(A, filename):
 
 # Function to save data in HDF5 format
 def save_output_hdf5(hdf5_filename, output):
+    """
+    Save output dictionary with complex numbers to HDF5 file.
+    
+    Parameters:
+        hdf5_filename (str): Output HDF5 file path.
+        output (dict): Dictionary with keys and list of dicts with 'real' and 'imaginary'.
+    """
     with h5py.File(hdf5_filename, 'w') as hdf5_file:
         for groupname, data in output.items():
             hdf5_group = hdf5_file.create_group(groupname)
             hdf5_group.create_dataset("real", data=[item["real"] for item in data])
             hdf5_group.create_dataset("imaginary", data=[item["imaginary"] for item in data])
-
-# Function to load data in HDF5 format
-def load_output_hdf5(filename):
-    output_list = []
-    with h5py.File(filename, 'r') as f:
-        for key in f.keys():
-            real_data = f[f'{key}/real'][:]
-            imag_data = f[f'{key}/imaginary'][:]
-            complex_data = [complex(real, imag) for real, imag in zip(real_data, imag_data)]
-            output_list.extend(complex_data)
-    return output_list
 
 ##############################################################################
 def FORWARD_D_2D_rect_matrix(group, BC, conv, dx, dy, D):

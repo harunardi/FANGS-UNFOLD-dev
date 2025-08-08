@@ -11,6 +11,16 @@ sys.dont_write_bytecode = True
 
 # Function to convert 1D indexes
 def convert_index_1D(D, N):
+    """
+    Convert 1D index mapping based on nonzero elements in D.
+    
+    Parameters:
+        D (array): 2D array where D[0][n] is checked for nonzero.
+        N (int): Number of elements.
+    
+    Returns:
+        list: Conversion array with incremented indices for nonzero D[0][n].
+    """
     conv = [0] * (N)
     tmp_conv = 0
     for n in range(N):
@@ -21,6 +31,13 @@ def convert_index_1D(D, N):
 
 # Function to save data in HDF5 format
 def save_output_hdf5(filename, output_dict):
+    """
+    Save output dictionary with complex numbers to HDF5 file.
+    
+    Parameters:
+        filename (str): Output HDF5 file path.
+        output_dict (dict): Dictionary with keys and list of dicts with 'real' and 'imaginary'.
+    """
     with h5py.File(filename, 'w') as f:
         for key, value in output_dict.items():
             real_data = np.array([complex_number['real'] for complex_number in value])
@@ -28,19 +45,15 @@ def save_output_hdf5(filename, output_dict):
             f.create_dataset(f'{key}/real', data=real_data)
             f.create_dataset(f'{key}/imaginary', data=imag_data)
 
-# Function to load data in HDF5 format
-def load_output_hdf5(filename):
-    output_dict = {}
-    with h5py.File(filename, 'r') as f:
-        for key in f.keys():
-            real_data = f[f'{key}/real'][:]
-            imag_data = f[f'{key}/imaginary'][:]
-            complex_data = [complex(real, imag) for real, imag in zip(real_data, imag_data)]
-            output_dict[key] = [{"real": c.real, "imaginary": c.imag} for c in complex_data]
-    return output_dict
-
 # Function to save sparse matrix to file
 def save_sparse_matrix(A, filename):
+    """
+    Save a sparse matrix to a text file in COO format.
+    
+    Parameters:
+        A (scipy.sparse matrix): Sparse matrix to save.
+        filename (str): Output file path.
+    """
     A_coo = A.tocoo()
     I, J, V = A_coo.row, A_coo.col, A_coo.data
     
@@ -52,6 +65,19 @@ def save_sparse_matrix(A, filename):
 
 ##############################################################################
 def FORWARD_D_1D_matrix(group, BC, N, dx, D):
+    """
+    Construct the forward diffusion matrix for 1D geometry with boundary conditions.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        BC (list): Boundary conditions [left, right].
+        N (int): Number of spatial cells.
+        dx (float): Cell width.
+        D (array): Diffusion coefficients.
+    
+    Returns:
+        lil_matrix: Sparse matrix for forward diffusion.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
 
@@ -94,6 +120,18 @@ def FORWARD_D_1D_matrix(group, BC, N, dx, D):
     return matrix
 
 def FORWARD_NUFIS_1D_matrix(group, N, chi, NUFIS):
+    """
+    Construct the forward fission production matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        chi (array): Fission spectrum.
+        NUFIS (array): Nu-fission cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for fission production.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N,group*N))
     for i in range(group):
@@ -104,6 +142,17 @@ def FORWARD_NUFIS_1D_matrix(group, N, chi, NUFIS):
     return matrix
 
 def FORWARD_SCAT_1D_matrix(group, N, SIGS):
+    """
+    Construct the forward scattering matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        SIGS (array): Scattering cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for scattering.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
 
@@ -119,6 +168,17 @@ def FORWARD_SCAT_1D_matrix(group, N, SIGS):
     return matrix
 
 def FORWARD_TOT_1D_matrix(group, N, TOT):
+    """
+    Construct the forward total cross section matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        TOT (array): Total cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for total cross section.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
     
@@ -131,6 +191,19 @@ def FORWARD_TOT_1D_matrix(group, N, TOT):
 
 ##############################################################################
 def ADJOINT_D_1D_matrix(group, BC, N, dx, D):
+    """
+    Construct the adjoint diffusion matrix for 1D geometry with boundary conditions.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        BC (list): Boundary conditions [left, right].
+        N (int): Number of spatial cells.
+        dx (float): Cell width.
+        D (array): Diffusion coefficients.
+    
+    Returns:
+        lil_matrix: Sparse matrix for adjoint diffusion.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
 
@@ -173,6 +246,17 @@ def ADJOINT_D_1D_matrix(group, BC, N, dx, D):
     return matrix
 
 def ADJOINT_TOT_1D_matrix(group, N, TOT):
+    """
+    Construct the adjoint total cross section matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        TOT (array): Total cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for adjoint total cross section (transposed).
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
     
@@ -184,6 +268,17 @@ def ADJOINT_TOT_1D_matrix(group, N, TOT):
     return matrix.transpose()
 
 def ADJOINT_SCAT_1D_matrix(group, N, SIGS):
+    """
+    Construct the adjoint scattering matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        SIGS (array): Scattering cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for adjoint scattering (transposed).
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
 
@@ -199,6 +294,18 @@ def ADJOINT_SCAT_1D_matrix(group, N, SIGS):
     return matrix.transpose()
 
 def ADJOINT_NUFIS_1D_matrix(group, N, chi, NUFIS):
+    """
+    Construct the adjoint fission production matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        chi (array): Fission spectrum.
+        NUFIS (array): Nu-fission cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for adjoint fission production (transposed).
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N,group*N))
     for i in range(group):
@@ -210,6 +317,19 @@ def ADJOINT_NUFIS_1D_matrix(group, N, chi, NUFIS):
 
 ##############################################################################
 def NOISE_D_1D_matrix(group, BC, N, dx, D):
+    """
+    Construct the noise diffusion matrix for 1D geometry with boundary conditions.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        BC (list): Boundary conditions [left, right].
+        N (int): Number of spatial cells.
+        dx (float): Cell width.
+        D (array): Diffusion coefficients.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise diffusion.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N))
 
@@ -252,6 +372,17 @@ def NOISE_D_1D_matrix(group, BC, N, dx, D):
     return matrix
 
 def NOISE_TOT_1D_matrix(group, N, TOT):
+    """
+    Construct the noise total cross section matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        TOT (array): Total cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise total cross section.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N), dtype=complex)
     
@@ -263,6 +394,17 @@ def NOISE_TOT_1D_matrix(group, N, TOT):
     return matrix
 
 def NOISE_SCAT_1D_matrix(group, N, SIGS):
+    """
+    Construct the noise scattering matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        SIGS (array): Scattering cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise scattering.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N), dtype=complex)
 
@@ -278,6 +420,22 @@ def NOISE_SCAT_1D_matrix(group, N, SIGS):
     return matrix
 
 def NOISE_NUFIS_1D_matrix(group, N, chi_p, chi_d, NUFIS, k_complex, Beff, keff):
+    """
+    Construct the noise fission production matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        chi_p (array): Prompt fission spectrum.
+        chi_d (array): Delayed fission spectrum.
+        NUFIS (array): Nu-fission cross sections.
+        k_complex (complex): Complex eigenvalue.
+        Beff (float): Effective delayed neutron fraction.
+        keff (float): Effective multiplication factor.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise fission production.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N,group*N), dtype=complex)
     for i in range(group):
@@ -288,6 +446,18 @@ def NOISE_NUFIS_1D_matrix(group, N, chi_p, chi_d, NUFIS, k_complex, Beff, keff):
     return matrix
 
 def NOISE_FREQ_1D_matrix(group, N, omega, v):
+    """
+    Construct the noise frequency matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        omega (float): Frequency.
+        v (array): Neutron velocities.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise frequency.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N), dtype=complex)
     
@@ -299,6 +469,17 @@ def NOISE_FREQ_1D_matrix(group, N, omega, v):
     return matrix
 
 def NOISE_dTOT_1D_matrix(group, N, dTOT):
+    """
+    Construct the noise perturbed total cross section matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        dTOT (array): Perturbed total cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise perturbed total cross section.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N), dtype=complex)
     
@@ -310,6 +491,17 @@ def NOISE_dTOT_1D_matrix(group, N, dTOT):
     return matrix
 
 def NOISE_dSCAT_1D_matrix(group, N, dSIGS):
+    """
+    Construct the noise perturbed scattering matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        dSIGS (array): Perturbed scattering cross sections.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise perturbed scattering.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N, group*N), dtype=complex)
 
@@ -325,6 +517,22 @@ def NOISE_dSCAT_1D_matrix(group, N, dSIGS):
     return matrix
 
 def NOISE_dNUFIS_1D_matrix(group, N, chi_p, chi_d, dNUFIS, k_complex, Beff, keff):
+    """
+    Construct the noise perturbed fission production matrix for 1D geometry.
+    
+    Parameters:
+        group (int): Number of energy groups.
+        N (int): Number of spatial cells.
+        chi_p (array): Prompt fission spectrum.
+        chi_d (array): Delayed fission spectrum.
+        dNUFIS (array): Perturbed nu-fission cross sections.
+        k_complex (complex): Complex eigenvalue.
+        Beff (float): Effective delayed neutron fraction.
+        keff (float): Effective multiplication factor.
+    
+    Returns:
+        lil_matrix: Sparse matrix for noise perturbed fission production.
+    """
     # Initialize the full matrix with zeros
     matrix = lil_matrix((group*N,group*N), dtype=complex)
     for i in range(group):
